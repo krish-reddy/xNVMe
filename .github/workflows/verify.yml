@@ -468,7 +468,7 @@ jobs:
 
     - name: Install and test xNVMe Python bindings (ctypes)
       run: |
-        python3 -m pip install xnvme-core/dist/xnvme-core-*.tar.gz --user
+        python3 -m pip install xnvme-core/dist/xnvme-core-*.tar.gz --user || python3 -m pip install xnvme-core/dist/xnvme-core-*.tar.gz --user --break-system-packages
         python3 -m pytest --pyargs xnvme.ctypes_bindings
 
     # This also requires installing 'xnvme/cython_header/tests' from the tarball/repository
@@ -478,10 +478,11 @@ jobs:
     # Didn't this get fixes previously? Why is this a problem again?
     - name: Install and test xNVMe Cython header (libxnvme.pxd)
       run: |
-        python3 -m pip install xnvme-cy-header/dist/xnvme-cy-header-*.tar.gz --user
-        cd python/xnvme-cy-header/xnvme/cython_header/tests/ && python3 -m pip install -r requirements.txt --user
+        python3 -m pip install xnvme-cy-header/dist/xnvme-cy-header-*.tar.gz --user || python3 -m pip install xnvme-cy-header/dist/xnvme-cy-header-*.tar.gz --user --break-system-packages
+        cd python/xnvme-cy-header/xnvme/cython_header/tests/
+        python3 -m pip install -r requirements.txt --user || python3 -m pip install -r requirements.txt --user --break-system-packages
         # Debian Bookworm python3-setuptools package is seemingly broken. Force install of newest package on PyPi.
-        python3 -m pip install setuptools --force --user
+        python3 -m pip install setuptools --force --user || python3 -m pip install setuptools --force --user --break-system-packages
         PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig" python3 setup.py build_ext --inplace
         python3 -m pytest --cython-collect test_cython.pyx::test_dummy -v -s
 
@@ -494,9 +495,9 @@ jobs:
     # Perhaps no longer the 'xnvme-core'?
     - name: Install and test xNVMe Python bindings (Cython)
       run: |
-        python3 -m pip install -r python/xnvme-cy-bindings/requirements.txt --user
-        python3 -m pip install xnvme-cy-bindings/dist/xnvme-cy-bindings-*.tar.gz --user -vvv --no-build-isolation
-        python3 -m pip install -r python/xnvme-cy-bindings/xnvme/cython_bindings/tests/requirements.txt --user
+        python3 -m pip install -r python/xnvme-cy-bindings/requirements.txt --user || python3 -m pip install -r python/xnvme-cy-bindings/requirements.txt --user --break-system-packages 
+        python3 -m pip install xnvme-cy-bindings/dist/xnvme-cy-bindings-*.tar.gz --user -vvv --no-build-isolation || python3 -m pip install xnvme-cy-bindings/dist/xnvme-cy-bindings-*.tar.gz --user -vvv --no-build-isolation --break-system-packages
+        python3 -m pip install -r python/xnvme-cy-bindings/xnvme/cython_bindings/tests/requirements.txt --user || python3 -m pip install -r python/xnvme-cy-bindings/xnvme/cython_bindings/tests/requirements.txt --user --break-system-packages
         python3 -m pytest --pyargs xnvme.cython_bindings -k 'test_version' -s
 
     #
@@ -511,7 +512,7 @@ jobs:
       run: |
         python3 -m pip uninstall cijoe cijoe-pkg-xnvme cijoe-pkg-linux cijoe-pkg-qemu cijoe-pkg-example -y
         python3 -m pip list
-        python3 -m pip install cijoe --upgrade
+        python3 -m pip install cijoe --upgrade 
         pushd toolbox/cijoe-pkg-xnvme && make all && popd
         cijoe -r
 
